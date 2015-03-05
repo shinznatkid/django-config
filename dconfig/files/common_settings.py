@@ -96,3 +96,5 @@ if import_app('picker', INSTALLED_APPS):
         'bootstrap-cosmo',
         'less',
     )
+
+import_app('dconfig', INSTALLED_APPS)  # Try import dconfig it self
