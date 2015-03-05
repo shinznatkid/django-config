@@ -2,5 +2,5 @@ from .common_settings import *
 
 
 INSTALLED_APPS += [
-    'config',
+    'dconfig',
 ]
