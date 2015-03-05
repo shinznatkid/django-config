@@ -1,7 +1,7 @@
-Django config
+Dconfig
 =================
 
-Django config is configuration by console for the Django web
+Dconfig is configuration by console for the Django web
 development framework.
 
 Usage

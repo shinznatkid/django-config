@@ -16,8 +16,10 @@ setup(
         'django>=1.4.2',
         'pathlib>=1.0.0',
     ],
+    zip_safe=False,
+    include_package_data=True,
     classifiers=[
-        'Development Status :: 3 - Production/Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Environment :: Web Environment',
         'Framework :: Django',
