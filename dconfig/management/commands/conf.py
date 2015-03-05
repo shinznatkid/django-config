@@ -155,7 +155,7 @@ class ConfMain(ConfBase):
     command = 'main'
     command_list = [('show', 'show'), ('exit', 'exit'), ('save', 'save'), ('timezone', 'timezone'), ('autoconfig', 'autoconfig'), ('initialize', 'initialize'), ('help', 'help')]
 
-    def __init__(self):
+    def __init__(self, package_path=Path('.')):
         print('Django Configure 1.0')
         print('Type "help" for more information.')
         setting_path      = os.environ.get("DJANGO_SETTINGS_MODULE")  # 'projectname.settings'
@@ -164,6 +164,8 @@ class ConfMain(ConfBase):
         self.project_path = Path(self.project_name)
         self.root_path    = self.project_path.parent
         self.setting_path = Path(setting_path)
+        self.package_path = package_path
+        self.files_path   = package_path / 'files'
         self.load()
 
         conf_list = []
@@ -259,7 +261,8 @@ class ConfMain(ConfBase):
         '''
         print('Re-initial configuration (Old settings will be lost).')
         print('copying common_settings.py')
-        with open('config/files/common_settings.py', 'r') as fr:
+        files_common_settings_path = self.files_path / 'common_settings.py'
+        with files_common_settings_path.open('r') as fr:
             new_data = fr.read().replace('{DJANGO_PROJECT}', self.project_name)
 
             chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -269,20 +272,21 @@ class ConfMain(ConfBase):
             with common_settings.open('w') as fw:
                 fw.write(new_data)
         print('copying %s' % (self.project_path / 'settings.py'))
-        shutil.copy('config/files/settings.py', str(self.project_path / 'settings.py'))
+
+        shutil.copy(str(self.files_path / 'settings.py'), str(self.project_path / 'settings.py'))
         print('copying secrets.json.default')
-        shutil.copy('config/files/secrets.json.default', str(self.root_path / 'secrets.json.default'))
+        shutil.copy(str(self.files_path / 'secrets.json.default'), str(self.root_path / 'secrets.json.default'))
         if not os.path.exists('utils'):
             print('creating utils')
             os.makedirs('utils')
         print('copying utils/__init__.py')
-        shutil.copy('config/files/utils/__init__.py', str(self.root_path / 'utils' / '__init__.py'))
+        shutil.copy(str(self.files_path / 'utils' / '__init__.py'), str(self.root_path / 'utils' / '__init__.py'))
         print('copying utils/decorators.py')
-        shutil.copy('config/files/utils/decorators.py', str(self.root_path / 'utils' / 'decorators.py'))
+        shutil.copy(str(self.files_path / 'utils' / 'decorators.py'), str(self.root_path / 'utils' / 'decorators.py'))
         print('copying utils/misc.py')
-        shutil.copy('config/files/utils/misc.py', str(self.root_path / 'utils' / 'misc.py'))
+        shutil.copy(str(self.files_path / 'utils' / 'misc.py'), str(self.root_path / 'utils' / 'misc.py'))
         print('copying fabfile.py')
-        shutil.copy('config/files/fabfile.py', str(self.root_path / 'fabfile.py'))
+        shutil.copy(str(self.files_path / 'fabfile.py'), str(self.root_path / 'fabfile.py'))
         self.load()
 
     def exit(self):
@@ -306,5 +310,6 @@ class Command(BaseCommand):
     state = ''
 
     def handle(self, *args, **options):
-        ConfMain().run()
+        package_path = Path(__file__).parent.parent.parent
+        ConfMain(package_path=package_path).run()
         self.stdout.write('Bye.')
