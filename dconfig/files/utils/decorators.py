@@ -14,9 +14,13 @@ def json_response(func):
             return objects
         try:
             data = json.dumps(objects)
-            if 'callback' in request.REQUEST:
+            if 'callback' in request.GET:
                 # a jsonp response!
-                data = '%s(%s);' % (request.REQUEST['callback'], data)
+                data = '%s(%s);' % (request.GET['callback'], data)
+                return HttpResponse(data, "text/javascript")
+            if 'callback' in request.POST:
+                # a jsonp response!
+                data = '%s(%s);' % (request.POST['callback'], data)
                 return HttpResponse(data, "text/javascript")
         except:
             data = json.dumps(str(objects))
