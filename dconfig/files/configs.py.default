@@ -1,0 +1,7 @@
+PRODUCTION = False
+ENGINE = 'mysql'
+DB_NAME = 'dbname'
+DB_USER = 'dbuser'
+DB_PASSWORD = 'dbpass'
+# ALLOWED_HOSTS = ['example.com']
+RAVEN_DSN = False
