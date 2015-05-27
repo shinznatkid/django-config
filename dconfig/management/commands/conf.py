@@ -274,8 +274,8 @@ class ConfMain(ConfBase):
         print('copying %s' % (self.project_path / 'settings.py'))
 
         shutil.copy(str(self.files_path / 'settings.py'), str(self.project_path / 'settings.py'))
-        print('copying secrets.json.default')
-        shutil.copy(str(self.files_path / 'secrets.json.default'), str(self.root_path / 'secrets.json.default'))
+        print('copying configs.py.default')
+        shutil.copy(str(self.files_path / 'configs.py.default'), str(self.root_path / 'configs.py.default'))
         if not os.path.exists('utils'):
             print('creating utils')
             os.makedirs('utils')
