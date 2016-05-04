@@ -260,7 +260,10 @@ class ConfMain(ConfBase):
         Initialize template with settings and utils files.
         '''
         print('Re-initial configuration (Old settings will be lost).')
+
         print('copying %s' % (self.project_path / 'auto_settings.py'))
+        shutil.copy(str(self.files_path / 'auto_settings.py'), str(self.project_path / 'auto_settings.py'))
+
         print('copying common_settings.py')
         files_common_settings_path = self.files_path / 'common_settings.py'
         with files_common_settings_path.open('r') as fr:
@@ -273,8 +276,8 @@ class ConfMain(ConfBase):
             with common_settings.open('w') as fw:
                 fw.write(new_data)
         print('copying %s' % (self.project_path / 'settings.py'))
-
         shutil.copy(str(self.files_path / 'settings.py'), str(self.project_path / 'settings.py'))
+
         print('copying configs.py.default')
         shutil.copy(str(self.files_path / 'configs.py.default'), str(self.root_path / 'configs.py.default'))
         if not os.path.exists('utils'):
@@ -313,7 +316,20 @@ class Command(BaseCommand):
     help = ''
     state = ''
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--initialize',
+            dest='initialize',
+            action='store_true',
+            default=False,
+            help='Initialize django application (WARNING: override all previous file)'
+        )
+
     def handle(self, *args, **options):
         package_path = Path(__file__).parent.parent.parent
-        ConfMain(package_path=package_path).run()
+
+        if options['initialize']:
+            ConfMain(package_path=package_path).initialize()
+        else:
+            ConfMain(package_path=package_path).run()
         self.stdout.write('Bye.')
