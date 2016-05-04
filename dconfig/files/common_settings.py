@@ -163,11 +163,10 @@ if RAVEN_DSN:
         'propagate': False,
     }
     LOGGING['loggers']['sentry.errors'] = {
-        'level': 'DEBUG',
+        'level': 'ERROR',
         'handlers': ['console'],
         'propagate': False,
     }
     LOGGING['handlers']['console']['formatter'] = 'verbose'
 
-    MIDDLEWARE_CLASSES.append('raven.contrib.django.raven_compat.middleware.Sentry404CatchMiddleware')
     MIDDLEWARE_CLASSES.append('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware')

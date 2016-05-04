@@ -260,6 +260,7 @@ class ConfMain(ConfBase):
         Initialize template with settings and utils files.
         '''
         print('Re-initial configuration (Old settings will be lost).')
+        print('copying %s' % (self.project_path / 'auto_settings.py'))
         print('copying common_settings.py')
         files_common_settings_path = self.files_path / 'common_settings.py'
         with files_common_settings_path.open('r') as fr:
