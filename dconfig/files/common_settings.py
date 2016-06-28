@@ -112,7 +112,7 @@ LOGGING = {
     'handlers': {
         'null': {
             'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler',
+            'class': 'logging.NullHandler',  # Older version use django.utils.log.NullHandler
         },
         'console': {
             'level': 'DEBUG',

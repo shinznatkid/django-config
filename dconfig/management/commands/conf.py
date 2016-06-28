@@ -294,6 +294,13 @@ class ConfMain(ConfBase):
         if not os.path.exists('static'):
             print('creating static')
             os.makedirs('static')
+        if not os.path.exists('media'):
+            print('creating media')
+            os.makedirs('media')
+        print('copying %s' % (self.root_path / '.gitignore'))
+        shutil.copy(str(self.files_path / 'gitignore'), str(self.root_path / '.gitignore'))
+        print('copying %s' % (self.root_path / 'meia' / '.gitignore'))
+        shutil.copy(str(self.files_path / 'meia' / 'gitignore'), str(self.root_path / 'meia' / '.gitignore'))
         self.load()
 
     def exit(self):
