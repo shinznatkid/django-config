@@ -300,7 +300,7 @@ class ConfMain(ConfBase):
         print('copying %s' % (self.root_path / '.gitignore'))
         shutil.copy(str(self.files_path / 'gitignore'), str(self.root_path / '.gitignore'))
         print('copying %s' % (self.root_path / 'media' / '.gitignore'))
-        shutil.copy(str(self.files_path / 'media' / 'gitignore'), str(self.root_path / 'meia' / '.gitignore'))
+        shutil.copy(str(self.files_path / 'media' / 'gitignore'), str(self.root_path / 'media' / '.gitignore'))
         self.load()
 
     def exit(self):
