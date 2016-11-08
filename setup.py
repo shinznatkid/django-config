@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.4.2'
+version = '0.5.0'
 
 packages = find_packages()
 
@@ -17,7 +17,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Environment :: Web Environment',
         'Framework :: Django',

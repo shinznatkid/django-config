@@ -1,10 +1,22 @@
 from utils.misc import import_app
 from pathlib import Path
 
+
+class EnvironDict(object):
+
+    def __getattr__(self, attrname):
+        import os
+        if attrname in os.environ:
+            return os.environ[attrname]
+        raise AttributeError()
+
 try:
     import configs
 except ImportError:
-    configs = {}
+    try:
+        configs = EnvironDict()
+    except:
+        configs = {}
 
 
 BASE = Path(__file__).resolve().parent.parent
@@ -74,12 +86,23 @@ MIDDLEWARE_CLASSES = [
 
 TEMPLATE_CONTEXT_PROCESSORS = [
     "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
+    "django.template.context_processors.debug",
+    "django.template.context_processors.i18n",
+    "django.template.context_processors.media",
+    "django.template.context_processors.static",
+    "django.template.context_processors.tz",
     "django.contrib.messages.context_processors.messages",
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': TEMPLATE_DIRS,
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': TEMPLATE_CONTEXT_PROCESSORS,
+        },
+    },
 ]
 
 if DEBUG:
