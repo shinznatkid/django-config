@@ -4,28 +4,31 @@ from pathlib import Path
 
 class EnvironDict(object):
 
+    def __init__(self, prefix):
+        self.prefix = prefix
+
     def __getattr__(self, attrname):
         import os
         if attrname in os.environ:
-            return os.environ[attrname]
+            return os.environ[self.prefix + attrname]
         raise AttributeError()
 
 try:
     import configs
 except ImportError:
     try:
-        configs = EnvironDict()
+        configs = EnvironDict('DJANGO_')
     except:
         configs = {}
 
 
-BASE = Path(__file__).resolve().parent.parent
+PROJECT_PATH = Path(__file__).resolve().parent
+BASE = PROJECT_PATH.parent
 
 SECRET_KEY = getattr(configs, 'SECRET_KEY', '+y01%7#9aipmcca171@(%%3i0v#mi(f32&a-(+r0=w_i7mj2yk')
 PRODUCTION = getattr(configs, 'PRODUCTION', False)
 
 DEBUG = not PRODUCTION
-TEMPLATE_DEBUG = not PRODUCTION
 
 ALLOWED_HOSTS = getattr(configs, 'ALLOWED_HOSTS', [])
 
@@ -68,10 +71,13 @@ USE_L10N = True
 USE_TZ = False
 DATE_FORMAT = "SHORT_DATE_FORMAT"
 
-TEMPLATE_DIRS = [str(BASE / 'templates')]
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [str(BASE / 'static')]
 STATIC_ROOT = str(BASE / 'static_root')
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = str(BASE / 'media')
 
@@ -84,23 +90,31 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-TEMPLATE_CONTEXT_PROCESSORS = [
-    "django.contrib.auth.context_processors.auth",
-    "django.template.context_processors.debug",
-    "django.template.context_processors.i18n",
-    "django.template.context_processors.media",
-    "django.template.context_processors.static",
-    "django.template.context_processors.tz",
-    "django.contrib.messages.context_processors.messages",
-]
+'''
+How to access or edit this templates
 
+use:
+    TEMPLATES['keys'] = 'value'
+example:
+    TEMPLATES['OPTIONS']['context_processors'].append('mycontext_processors')
+
+'''
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': TEMPLATE_DIRS,
+        'DIRS': [str(BASE / 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
-            'context_processors': TEMPLATE_CONTEXT_PROCESSORS,
+            'debug': getattr(configs, 'TEMPLATE_DEBUG', DEBUG),
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages",
+            ],
         },
     },
 ]
@@ -112,15 +126,7 @@ if DEBUG:
             MIDDLEWARE_CLASSES.index('django.middleware.common.CommonMiddleware') + 1,
             'debug_toolbar.middleware.DebugToolbarMiddleware')
 
-if import_app('picker', INSTALLED_APPS):
-    PICKER_INSTALLED_APPS = (
-        'jquery',
-        'bootstrap',
-        'bootstrap-cosmo',
-        'less',
-    )
-
-import_app('dconfig', INSTALLED_APPS)  # Try import dconfig it self
+    import_app('dconfig', INSTALLED_APPS)  # Try import dconfig it self
 
 
 LOGGING = {
@@ -157,39 +163,14 @@ LOGGING = {
     },
 }
 
-RAVEN_DSN = getattr(configs, 'RAVEN_DSN', False)
-if RAVEN_DSN:
-    import raven
-    INSTALLED_APPS += [
-        'raven.contrib.django.raven_compat',
-    ]
 
-    RAVEN_CONFIG = {
-        'dsn': RAVEN_DSN,
-        'release': raven.fetch_git_sha(str(BASE)),
-    }
+# Automation path
+from .auto_settings import *  # pylint: disable=W0401
 
-    LOGGING['formatters']['verbose']  = {
-        'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-    }
-    LOGGING['handlers']['sentry'] = {
-        'level': 'ERROR',
-        'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-    }
-    LOGGING['root'] = {
-        'level': 'WARNING',
-        'handlers': ['sentry'],
-    }
-    LOGGING['loggers']['raven'] = {
-        'level': 'DEBUG',
-        'handlers': ['console'],
-        'propagate': False,
-    }
-    LOGGING['loggers']['sentry.errors'] = {
-        'level': 'ERROR',
-        'handlers': ['console'],
-        'propagate': False,
-    }
-    LOGGING['handlers']['console']['formatter'] = 'verbose'
+INSTALLED_APPS += AUTO_INSTALLED_APPS
 
-    MIDDLEWARE_CLASSES.append('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware')
+for package in AUTO_INSTALLED_APPS:
+    setting_path = PROJECT_PATH / 'auto_setting_modules' / package / 'settings.py'
+    with open(setting_path, 'rt') as f:
+        raw_script = f.read()
+    exec(raw_script)

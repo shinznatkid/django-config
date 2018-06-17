@@ -1,5 +1,10 @@
-from .common_settings import *
-from .auto_settings import *
+from .common_settings import *  # pylint: disable=W0401
 
 
 INSTALLED_APPS += []
+
+
+try:
+    from configs import *  # pylint: disable=W0401
+except ImportError:
+    pass

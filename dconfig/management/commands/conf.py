@@ -1,11 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8
-from django.core.management.base import BaseCommand
-from django.utils.crypto import get_random_string
-from pathlib import Path
-import shutil
 import re
 import os
+import shutil
+from pathlib import Path
+
+from django.core.management.base import BaseCommand
+from django.utils.crypto import get_random_string
+
+from ...installer import AppInstaller
 
 
 try:
@@ -156,7 +159,7 @@ class ConfMain(ConfBase):
     command_list = [('show', 'show'), ('exit', 'exit'), ('save', 'save'), ('timezone', 'timezone'), ('autoconfig', 'autoconfig'), ('initialize', 'initialize'), ('help', 'help')]
 
     def __init__(self, package_path=Path('.')):
-        print('Django Configure 1.0')
+        print('Django Configure 1.1.0')
         print('Type "help" for more information.')
         setting_path      = os.environ.get("DJANGO_SETTINGS_MODULE")  # 'projectname.settings'
         self.project_name = setting_path.split('.')[0]
@@ -166,6 +169,7 @@ class ConfMain(ConfBase):
         self.setting_path = Path(setting_path)
         self.package_path = package_path
         self.files_path   = package_path / 'files'
+        self.is_exit      = False
         self.load()
 
         conf_list = []
@@ -259,7 +263,36 @@ class ConfMain(ConfBase):
         '''
         Initialize template with settings and utils files.
         '''
+
+        def copy_file(self, source, dest=None):
+            if not dest:
+                dest = source
+
+            print('copying {}'.format('/'.join(dest)))
+            source_path = self.files_path
+            for source_item in source:
+                source_path = source_path / source_item
+            dest_path = self.root_path
+            for dest_item in dest:
+                dest_path = dest_path / dest_item
+
+            shutil.copy(str(source_path), str(dest_path))
+
+        def create_dir(dest):
+            if not os.path.exists(dest):
+                print('creating {}'.format(dest))
+                os.makedirs(dest)
+
         print('Re-initial configuration (Old settings will be lost).')
+        command = input('Proceed? [Y/n]>')
+        if command.lower().startswith('n'):
+            print('Aborted.')
+            return
+
+        print('creating {}'.format('auto_setting_modules'))
+        create_dir(str(self.project_path / 'auto_setting_modules'))
+        print('copying %s' % (self.project_path / 'auto_setting_modules' / '__init__.py'))
+        shutil.copy(str(self.files_path / 'auto_setting_modules' / '__init__.py'), str(self.project_path / 'auto_setting_modules' / '__init__.py'))
 
         print('copying %s' % (self.project_path / 'auto_settings.py'))
         shutil.copy(str(self.files_path / 'auto_settings.py'), str(self.project_path / 'auto_settings.py'))
@@ -275,33 +308,65 @@ class ConfMain(ConfBase):
             common_settings = self.project_path / 'common_settings.py'
             with common_settings.open('w') as fw:
                 fw.write(new_data)
+
         print('copying %s' % (self.project_path / 'settings.py'))
         shutil.copy(str(self.files_path / 'settings.py'), str(self.project_path / 'settings.py'))
 
-        print('copying configs.py.default')
-        shutil.copy(str(self.files_path / 'configs.py.default'), str(self.root_path / 'configs.py.default'))
-        if not os.path.exists('utils'):
-            print('creating utils')
-            os.makedirs('utils')
-        print('copying utils/__init__.py')
-        shutil.copy(str(self.files_path / 'utils' / '__init__.py'), str(self.root_path / 'utils' / '__init__.py'))
-        print('copying utils/decorators.py')
-        shutil.copy(str(self.files_path / 'utils' / 'decorators.py'), str(self.root_path / 'utils' / 'decorators.py'))
-        print('copying utils/misc.py')
-        shutil.copy(str(self.files_path / 'utils' / 'misc.py'), str(self.root_path / 'utils' / 'misc.py'))
-        print('copying fabfile.py')
-        shutil.copy(str(self.files_path / 'fabfile.py'), str(self.root_path / 'fabfile.py'))
-        if not os.path.exists('static'):
-            print('creating static')
-            os.makedirs('static')
-        if not os.path.exists('media'):
-            print('creating media')
-            os.makedirs('media')
-        print('copying %s' % (self.root_path / '.gitignore'))
-        shutil.copy(str(self.files_path / 'gitignore'), str(self.root_path / '.gitignore'))
-        print('copying %s' % (self.root_path / 'media' / '.gitignore'))
-        shutil.copy(str(self.files_path / 'media' / 'gitignore'), str(self.root_path / 'media' / '.gitignore'))
+        copy_file(self, ['configs.py.default'])
+        # print('copying configs.py.default')
+        # shutil.copy(str(self.files_path / 'configs.py.default'), str(self.root_path / 'configs.py.default'))
+
+        create_dir('utils')
+        # if not os.path.exists('utils'):
+        #     print('creating utils')
+        #     os.makedirs('utils')
+
+        copy_file(self, ['utils', '__init__.py'])
+        # print('copying utils/__init__.py')
+        # shutil.copy(str(self.files_path / 'utils' / '__init__.py'), str(self.root_path / 'utils' / '__init__.py'))
+
+        copy_file(self, ['utils', 'decorators.py'])
+        # print('copying utils/decorators.py')
+        # shutil.copy(str(self.files_path / 'utils' / 'decorators.py'), str(self.root_path / 'utils' / 'decorators.py'))
+
+        copy_file(self, ['utils', 'misc.py'])
+        # print('copying utils/misc.py')
+        # shutil.copy(str(self.files_path / 'utils' / 'misc.py'), str(self.root_path / 'utils' / 'misc.py'))
+
+        copy_file(self, ['requirements.txt'])
+        # print('copying requirements.txt')
+        # shutil.copy(str(self.files_path / 'requirements.txt'), str(self.root_path / 'requirements.txt'))
+
+        copy_file(self, ['fabfile.py'])
+        # print('copying fabfile.py')
+        # shutil.copy(str(self.files_path / 'fabfile.py'), str(self.root_path / 'fabfile.py'))
+
+        create_dir('static')
+        # if not os.path.exists('static'):
+        #     print('creating static')
+        #     os.makedirs('static')
+
+        create_dir('media')
+        # if not os.path.exists('media'):
+        #     print('creating media')
+        #     os.makedirs('media')
+
+        copy_file(self, ['gitignore'], ['.gitignore'])
+        # print('copying %s' % (self.root_path / '.gitignore'))
+        # shutil.copy(str(self.files_path / 'gitignore'), str(self.root_path / '.gitignore'))
+
+        copy_file(self, ['media', 'gitignore'], ['media', '.gitignore'])
+        # print('copying %s' % (self.root_path / 'media' / '.gitignore'))
+        # shutil.copy(str(self.files_path / 'media' / 'gitignore'), str(self.root_path / 'media' / '.gitignore'))
         self.load()
+
+        command = input('Install recommend apps "{}" [Y/n]:'.format(', '.join(AppInstaller.RECOMMEND_APPS)))
+        if command.lower().startswith('n'):
+            return
+        app_installer = AppInstaller(package_path=self.package_path)
+        for app_name in AppInstaller.RECOMMEND_APPS:
+            print('Installing {}'.format(app_name))
+            app_installer.install_app(app_name)
 
     def exit(self):
         '''

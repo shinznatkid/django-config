@@ -1,4 +1,5 @@
 PRODUCTION = False
+# TEMPLATE_DEBUG = False  # Optional
 ENGINE = 'mysql'
 DB_NAME = 'dbname'
 DB_USER = 'dbuser'
