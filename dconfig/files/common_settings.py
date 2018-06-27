@@ -171,6 +171,6 @@ INSTALLED_APPS += AUTO_INSTALLED_APPS
 
 for package in AUTO_INSTALLED_APPS:
     setting_path = PROJECT_PATH / 'auto_setting_modules' / package / 'settings.py'
-    with open(setting_path, 'rt') as f:
+    with open(str(setting_path), 'rt') as f:
         raw_script = f.read()
     exec(raw_script)

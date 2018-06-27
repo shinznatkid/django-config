@@ -6,4 +6,5 @@ files = [
 requirements = [
     'django-sass-processor',
     'django-compressor',
+    'libsass',
 ]
