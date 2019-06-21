@@ -81,7 +81,7 @@ STATICFILES_FINDERS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = str(BASE / 'media')
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -122,8 +122,8 @@ TEMPLATES = [
 if DEBUG:
     if import_app('debug_toolbar', INSTALLED_APPS):
         INTERNAL_IPS = ['127.0.0.1']
-        MIDDLEWARE_CLASSES.insert(
-            MIDDLEWARE_CLASSES.index('django.middleware.common.CommonMiddleware') + 1,
+        MIDDLEWARE.insert(
+            MIDDLEWARE.index('django.middleware.common.CommonMiddleware') + 1,
             'debug_toolbar.middleware.DebugToolbarMiddleware')
 
     import_app('dconfig', INSTALLED_APPS)  # Try import dconfig it self

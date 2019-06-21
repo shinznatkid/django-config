@@ -34,4 +34,4 @@ if RAVEN_DSN:
     }
     LOGGING['handlers']['console']['formatter'] = 'verbose'
 
-    MIDDLEWARE_CLASSES.append('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware')
+    MIDDLEWARE.append('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware')

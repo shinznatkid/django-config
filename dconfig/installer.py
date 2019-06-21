@@ -43,7 +43,7 @@ class RequirementEditor:
 class AppInstaller:
 
     AVAILABLE_APPS = ['raven', 'picker', 'sass_processor']
-    RECOMMEND_APPS = ['raven', 'picker', 'sass_processor']
+    RECOMMEND_APPS = ['raven', 'picker']
 
     def __init__(self, package_path):
         self.package_path = package_path
