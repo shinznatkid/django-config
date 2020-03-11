@@ -9,8 +9,9 @@ class EnvironDict(object):
 
     def __getattr__(self, attrname):
         import os
-        if attrname in os.environ:
-            return os.environ[self.prefix + attrname]
+        full_attr_name = self.prefix + attrname
+        if full_attr_name in os.environ:
+            return os.environ[full_attr_name]
         raise AttributeError()
 
 try:
