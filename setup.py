@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.7.2'
+version = '1.0.0-rc1'
 
 packages = find_packages()
 

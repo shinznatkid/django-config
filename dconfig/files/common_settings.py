@@ -30,7 +30,9 @@ PRODUCTION = getattr(configs, 'PRODUCTION', False)
 
 DEBUG = not PRODUCTION
 
-ALLOWED_HOSTS = getattr(configs, 'ALLOWED_HOSTS', [])
+ALLOWED_HOSTS = getattr(configs, 'ALLOWED_HOSTS', ['*'])
+if isinstance(ALLOWED_HOSTS, str):
+    ALLOWED_HOSTS = ALLOWED_HOSTS.split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
