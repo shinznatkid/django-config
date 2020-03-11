@@ -1,5 +1,6 @@
 from utils.misc import import_app
 from pathlib import Path
+import dj_database_url
 
 
 class EnvironDict(object):
@@ -48,24 +49,30 @@ INSTALLED_APPS = [
 ROOT_URLCONF = '{DJANGO_PROJECT}.urls'
 WSGI_APPLICATION = '{DJANGO_PROJECT}.wsgi.application'
 
-ENGINE = getattr(configs, 'ENGINE', None)
-if not ENGINE or ENGINE == 'sqlite3':
+DATABASE_URL = getattr(configs, 'DATABASE_URL', None)
+if DATABASE_URL:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': getattr(configs, 'DB_NAME', str(BASE / 'db.sqlite3')),
-        }
+        'default': dj_database_url.config(default=DATABASE_URL),
     }
-elif ENGINE == 'mysql':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': getattr(configs, 'DB_NAME', 'dbname'),
-            'USER': getattr(configs, 'DB_USER', 'root'),
-            'PASSWORD': getattr(configs, 'DB_PASSWORD', 'password'),
-            'HOST': getattr(configs, 'DB_HOST', '127.0.0.1'),
+else:
+    ENGINE = getattr(configs, 'ENGINE', None)
+    if not ENGINE or ENGINE == 'sqlite3':
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': getattr(configs, 'DB_NAME', str(BASE / 'db.sqlite3')),
+            }
         }
-    }
+    elif ENGINE == 'mysql':
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME': getattr(configs, 'DB_NAME', 'dbname'),
+                'USER': getattr(configs, 'DB_USER', 'root'),
+                'PASSWORD': getattr(configs, 'DB_PASSWORD', 'password'),
+                'HOST': getattr(configs, 'DB_HOST', '127.0.0.1'),
+            }
+        }
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Bangkok'
