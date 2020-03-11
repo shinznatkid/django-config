@@ -169,8 +169,6 @@ LOGGING = {
 # Automation path
 from .auto_settings import *  # pylint: disable=W0401
 
-INSTALLED_APPS += AUTO_INSTALLED_APPS
-
 for package in AUTO_INSTALLED_APPS:
     setting_path = PROJECT_PATH / 'auto_setting_modules' / package / 'settings.py'
     with open(str(setting_path), 'rt') as f:

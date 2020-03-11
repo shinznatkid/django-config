@@ -312,52 +312,31 @@ class ConfMain(ConfBase):
         print('copying %s' % (self.project_path / 'settings.py'))
         shutil.copy(str(self.files_path / 'settings.py'), str(self.project_path / 'settings.py'))
 
-        copy_file(self, ['configs.py.default'])
-        # print('copying configs.py.default')
-        # shutil.copy(str(self.files_path / 'configs.py.default'), str(self.root_path / 'configs.py.default'))
+        url_django_debug_toolbar = '''from django.conf import settings
+from django.urls import include
+if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
+'''
+        print('writing debug_toolbar to %s' % (self.project_path / 'urls.py'))
+        with open(str(self.project_path / 'urls.py'), 'at') as fw:
+            fw.write('\n{}'.format(url_django_debug_toolbar))
 
+        copy_file(self, ['configs.py.default'])
         create_dir('utils')
-        # if not os.path.exists('utils'):
-        #     print('creating utils')
-        #     os.makedirs('utils')
 
         copy_file(self, ['utils', '__init__.py'])
-        # print('copying utils/__init__.py')
-        # shutil.copy(str(self.files_path / 'utils' / '__init__.py'), str(self.root_path / 'utils' / '__init__.py'))
-
         copy_file(self, ['utils', 'decorators.py'])
-        # print('copying utils/decorators.py')
-        # shutil.copy(str(self.files_path / 'utils' / 'decorators.py'), str(self.root_path / 'utils' / 'decorators.py'))
-
         copy_file(self, ['utils', 'misc.py'])
-        # print('copying utils/misc.py')
-        # shutil.copy(str(self.files_path / 'utils' / 'misc.py'), str(self.root_path / 'utils' / 'misc.py'))
-
         copy_file(self, ['requirements.txt'])
-        # print('copying requirements.txt')
-        # shutil.copy(str(self.files_path / 'requirements.txt'), str(self.root_path / 'requirements.txt'))
-
         copy_file(self, ['fabfile.py'])
-        # print('copying fabfile.py')
-        # shutil.copy(str(self.files_path / 'fabfile.py'), str(self.root_path / 'fabfile.py'))
-
         create_dir('static')
-        # if not os.path.exists('static'):
-        #     print('creating static')
-        #     os.makedirs('static')
-
         create_dir('media')
-        # if not os.path.exists('media'):
-        #     print('creating media')
-        #     os.makedirs('media')
 
         copy_file(self, ['gitignore'], ['.gitignore'])
-        # print('copying %s' % (self.root_path / '.gitignore'))
-        # shutil.copy(str(self.files_path / 'gitignore'), str(self.root_path / '.gitignore'))
-
         copy_file(self, ['media', 'gitignore'], ['media', '.gitignore'])
-        # print('copying %s' % (self.root_path / 'media' / '.gitignore'))
-        # shutil.copy(str(self.files_path / 'media' / 'gitignore'), str(self.root_path / 'media' / '.gitignore'))
         self.load()
 
         command = input('Install recommend apps "{}" [Y/n]:'.format(', '.join(AppInstaller.RECOMMEND_APPS)))

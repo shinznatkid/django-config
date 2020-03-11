@@ -42,8 +42,8 @@ class RequirementEditor:
 
 class AppInstaller:
 
-    AVAILABLE_APPS = ['raven', 'picker', 'sass_processor']
-    RECOMMEND_APPS = ['raven', 'picker']
+    AVAILABLE_APPS = ['sentry_sdk', 'picker', 'sass_processor']
+    RECOMMEND_APPS = ['sentry_sdk', 'picker']
 
     def __init__(self, package_path):
         self.package_path = package_path
@@ -66,19 +66,6 @@ class AppInstaller:
         1. __init__.py ใน auto_setting_modules
         2. auto_settings.py
         '''
-
-        # # __init__.py
-        # print('editing {}/auto_setting_modules/__init__.py'.format(self.project_name))
-        # auto_setting_modules_package = importlib.import_module('{}.auto_setting_modules'.format(self.project_name))
-        # values = auto_setting_modules_package.__all__
-        # if not isinstance(values, list):
-        #     values = []  # Override
-        # if app_name not in values:
-        #     values.append(app_name)
-
-        # auto_setting_modules_path = self.project_path / 'auto_setting_modules' / '__init__.py'
-        # with auto_setting_modules_path.open('wt') as file_write:
-        #     file_write.write('__all__ = {}'.format(values))
 
         # auto_settings.py
         AUTO_SETTINGS_HEADERS = 'from .auto_setting_modules import *'
@@ -130,7 +117,6 @@ class AppInstaller:
         requirement_data = requirement_editor.serialize()
         with requirements_path.open('wt') as f:
             f.write(requirement_data)
-
 
     def install_app(self, raw_app_name):
 

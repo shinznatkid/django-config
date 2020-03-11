@@ -1,4 +1,6 @@
 
+INSTALLED_APPS += ['sass_processor']
+
 STATICFILES_FINDERS += [
     'sass_processor.finders.CssFinder',
 ]

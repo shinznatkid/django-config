@@ -4,5 +4,5 @@ files = [
 ]
 
 requirements = [
-    'raven'
+    'sentry-sdk'
 ]
