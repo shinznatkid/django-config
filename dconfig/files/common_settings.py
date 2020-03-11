@@ -2,7 +2,7 @@ from utils.misc import import_app
 from pathlib import Path
 import dj_database_url
 
-# dconfig: 1.1
+# dconfig: 1.2
 
 class EnvironDict(object):
 

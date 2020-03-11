@@ -156,7 +156,7 @@ class ConfApp(ConfBase):
 
 class ConfMain(ConfBase):
     command = 'main'
-    command_list = [('show', 'show'), ('exit', 'exit'), ('save', 'save'), ('timezone', 'timezone'), ('autoconfig', 'autoconfig'), ('initialize', 'initialize'), ('help', 'help')]
+    command_list = [('show', 'show'), ('exit', 'exit'), ('save', 'save'), ('timezone', 'timezone'), ('autoconfig', 'autoconfig'), ('initialize', 'initialize'), ('migrate', 'migrate'), ('help', 'help')]
 
     def __init__(self, package_path=Path('.')):
         print('Django Configure 1.1.0')
@@ -264,20 +264,6 @@ class ConfMain(ConfBase):
         Initialize template with settings and utils files.
         '''
 
-        def copy_file(self, source, dest=None):
-            if not dest:
-                dest = source
-
-            print('copying {}'.format('/'.join(dest)))
-            source_path = self.files_path
-            for source_item in source:
-                source_path = source_path / source_item
-            dest_path = self.root_path
-            for dest_item in dest:
-                dest_path = dest_path / dest_item
-
-            shutil.copy(str(source_path), str(dest_path))
-
         def create_dir(dest):
             if not os.path.exists(dest):
                 print('creating {}'.format(dest))
@@ -324,19 +310,20 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
         with open(str(self.project_path / 'urls.py'), 'at') as fw:
             fw.write('\n{}'.format(url_django_debug_toolbar))
 
-        copy_file(self, ['configs.py.default'])
+        self._copy_file(['configs.py.default'])
         create_dir('utils')
 
-        copy_file(self, ['utils', '__init__.py'])
-        copy_file(self, ['utils', 'decorators.py'])
-        copy_file(self, ['utils', 'misc.py'])
-        copy_file(self, ['requirements.txt'])
-        copy_file(self, ['fabfile.py'])
+        self._copy_file(['utils', '__init__.py'])
+        self._copy_file(['utils', 'decorators.py'])
+        self._copy_file(['utils', 'misc.py'])
+        self._copy_file(['requirements.txt'])
+        self._copy_file(['fabfile.py'])
+        self._copy_file(['kube_init.sh'])
         create_dir('static')
         create_dir('media')
 
-        copy_file(self, ['gitignore'], ['.gitignore'])
-        copy_file(self, ['media', 'gitignore'], ['media', '.gitignore'])
+        self._copy_file(['gitignore'], ['.gitignore'])
+        self._copy_file(['media', 'gitignore'], ['media', '.gitignore'])
         self.load()
 
         command = input('Install recommend apps "{}" [Y/n]:'.format(', '.join(AppInstaller.RECOMMEND_APPS)))
@@ -346,6 +333,39 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
         for app_name in AppInstaller.RECOMMEND_APPS:
             print('Installing {}'.format(app_name))
             app_installer.install_app(app_name)
+
+    def migrate(self):
+        '''
+        Migrate config for up-to-date.
+        '''
+
+        app_installer = AppInstaller(package_path=self.package_path)
+        version = app_installer.get_settings_dconfig_version()
+        if not version:
+            print('Cannot migrate dconfig version <= 1.1.0 because version system wasn\'t implement yet')
+            return
+        
+        if version == (1, 1):
+            # Migrate 1.1.x to 1.2.x
+            print('Migrating from 1.1.x to 1.2.x')
+            self._copy_file(['kube_init.sh'])
+
+        print('Migrate completed.')
+        return
+
+    def _copy_file(self, source, dest=None):
+        if not dest:
+            dest = source
+
+        print('copying {}'.format('/'.join(dest)))
+        source_path = self.files_path
+        for source_item in source:
+            source_path = source_path / source_item
+        dest_path = self.root_path
+        for dest_item in dest:
+            dest_path = dest_path / dest_item
+
+        shutil.copy(str(source_path), str(dest_path))
 
     def exit(self):
         '''

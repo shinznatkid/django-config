@@ -53,6 +53,24 @@ class AppInstaller:
         self.project_path = Path(self.project_name)
         self.root_path    = self.project_path.parent
 
+    def get_settings_dconfig_version(self):
+        '''
+        if visible
+            return (major, minor)
+        Otherwise
+            return None
+        '''
+        common_setting_path = self.project_path / 'common_settings.py'
+        if not common_setting_path.exists():
+            return
+
+        with open(str(common_setting_path)) as fr:
+            for line in fr.readlines():
+                if line.startswith('# dconfig: '):  # matched
+                    raw_version = line[len('# dconfig: '):]
+                    major_version, minor_version = raw_version.strip().split('.')  # e.g. 1.1
+                    return int(major_version), int(minor_version)
+
     def get_install_app_name(self, app_name):
         app_name = app_name.lower()
         if app_name in self.AVAILABLE_APPS:
