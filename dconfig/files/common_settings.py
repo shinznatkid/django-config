@@ -1,8 +1,10 @@
+import os
 from utils.misc import import_app
 from pathlib import Path
 import dj_database_url
 
-# dconfig: 1.2
+# dconfig: 1.3
+
 
 class EnvironDict(object):
 
@@ -10,25 +12,25 @@ class EnvironDict(object):
         self.prefix = prefix
 
     def __getattr__(self, attrname):
-        import os
         full_attr_name = self.prefix + attrname
         if full_attr_name in os.environ:
             return os.environ[full_attr_name]
         raise AttributeError()
+
 
 try:
     import configs
 except ImportError:
     try:
         configs = EnvironDict('DJANGO_')
-    except:
+    except Exception:
         configs = {}
 
 
 PROJECT_PATH = Path(__file__).resolve().parent
 BASE = PROJECT_PATH.parent
 
-SECRET_KEY = getattr(configs, 'SECRET_KEY', '+y01%7#9aipmcca171@(%%3i0v#mi(f32&a-(+r0=w_i7mj2yk')
+SECRET_KEY = getattr(configs, 'SECRET_KEY', '{SECRET_KEY}')
 PRODUCTION = getattr(configs, 'PRODUCTION', False)
 
 DEBUG = not PRODUCTION
@@ -75,6 +77,7 @@ else:
             }
         }
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Bangkok'
 USE_I18N = True
@@ -124,7 +127,9 @@ TEMPLATES = [
                 "django.template.context_processors.media",
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
+                "django.template.context_processors.request",
                 "django.contrib.messages.context_processors.messages",
+                "{DJANGO_PROJECT}.context_processors.context_processor",
             ],
         },
     },
@@ -176,7 +181,7 @@ LOGGING = {
 
 
 # Automation path
-from .auto_settings import *  # pylint: disable=W0401
+from .auto_settings import *  # pylint: disable=W0401 NOSONAR
 
 for package in AUTO_INSTALLED_APPS:
     setting_path = PROJECT_PATH / 'auto_setting_modules' / package / 'settings.py'

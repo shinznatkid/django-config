@@ -1,0 +1,8 @@
+# Changelog
+
+## Dconfig 1.3
+
+- Include app `rest_framework` (install via `python manage.py install rest_framework`)
+- Include `utils/rest_views.py`
+- Include `rest_exception_handler.py`
+- Include `context_processors.py`

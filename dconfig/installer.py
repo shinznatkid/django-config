@@ -42,7 +42,7 @@ class RequirementEditor:
 
 class AppInstaller:
 
-    AVAILABLE_APPS = ['sentry_sdk', 'picker', 'sass_processor']
+    AVAILABLE_APPS = ['sentry_sdk', 'picker', 'sass_processor', 'rest_framework']
     RECOMMEND_APPS = ['sentry_sdk', 'picker']
 
     def __init__(self, package_path):
@@ -100,7 +100,8 @@ class AppInstaller:
 
         auto_setting_path = self.project_path / 'auto_settings.py'
         with auto_setting_path.open('wt') as file_write:
-            file_write.write('\r\n'.join(auto_settings_datas))
+            file_write.write('\n'.join(auto_settings_datas))
+            file_write.write('\n')
 
     def edit_requirements(self, requirements):
         # Insert to requirements.txt
@@ -156,7 +157,11 @@ class AppInstaller:
             print('copying {}'.format(file_name))
             source_path = self.files_path / 'auto_setting_modules' / app_name / file_name
             dest_path = self.project_path / 'auto_setting_modules' / app_name / file_name
-            shutil.copy(str(source_path), str(dest_path))
+            # shutil.copy(str(source_path), str(dest_path))
+            with source_path.open('r') as fr:
+                new_data = fr.read().replace('{DJANGO_PROJECT}', self.project_name)
+                with dest_path.open('w') as fw:
+                    fw.write(new_data)
 
         self.edit_requirements(app_package.requirements)
         self.edit_install_code(app_name)

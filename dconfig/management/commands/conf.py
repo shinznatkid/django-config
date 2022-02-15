@@ -100,6 +100,15 @@ class ConfApp(ConfBase):
                         self.current_apps.append(result.group('app_name'))
         self.is_exit = False
 
+    def help(self):
+        print('Available commands')
+        print('''show
+add
+delete
+clear
+exit
+save''')
+
     def show(self):
         print('Installed Applications:')
         for app in self.current_apps:
@@ -298,6 +307,12 @@ class ConfMain(ConfBase):
         print('copying %s' % (self.project_path / 'settings.py'))
         shutil.copy(str(self.files_path / 'settings.py'), str(self.project_path / 'settings.py'))
 
+        print('copying %s' % (self.project_path / 'context_processors.py'))
+        shutil.copy(str(self.files_path / 'context_processors.py'), str(self.project_path / 'context_processors.py'))
+
+        print('copying %s' % (self.project_path / 'rest_exception_handler.py'))
+        shutil.copy(str(self.files_path / 'rest_exception_handler.py'), str(self.project_path / 'rest_exception_handler.py'))
+
         url_django_debug_toolbar = '''from django.conf import settings
 from django.urls import include
 if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
@@ -316,6 +331,7 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
         self._copy_file(['utils', '__init__.py'])
         self._copy_file(['utils', 'decorators.py'])
         self._copy_file(['utils', 'misc.py'])
+        self._copy_file(['utils', 'rest_views.py'])
         self._copy_file(['requirements.txt'])
         self._copy_file(['fabfile.py'])
         self._copy_file(['kube_init.sh'])
@@ -344,11 +360,18 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
         if not version:
             print('Cannot migrate dconfig version <= 1.1.0 because version system wasn\'t implement yet')
             return
-        
+
         if version == (1, 1):
             # Migrate 1.1.x to 1.2.x
             print('Migrating from 1.1.x to 1.2.x')
             self._copy_file(['kube_init.sh'])
+
+        if version == (1, 2):
+            # Migrate 1.2.x to 1.3.x
+            print('Migrating from 1.2.x to 1.3.x')
+            self._copy_file(['utils', 'rest_views.py'])
+            shutil.copy(str(self.files_path / 'context_processors.py'), str(self.project_path / 'context_processors.py'))
+            shutil.copy(str(self.files_path / 'rest_exception_handler.py'), str(self.project_path / 'rest_exception_handler.py'))
 
         print('Migrate completed.')
         return
