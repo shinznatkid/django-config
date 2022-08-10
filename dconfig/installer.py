@@ -42,8 +42,8 @@ class RequirementEditor:
 
 class AppInstaller:
 
-    AVAILABLE_APPS = ['sentry_sdk', 'picker', 'sass_processor', 'rest_framework']
-    RECOMMEND_APPS = ['sentry_sdk', 'picker']
+    AVAILABLE_APPS = ['sentry_sdk', 'picker', 'sass_processor', 'rest_framework', 'cors_headers']
+    RECOMMEND_APPS = ['sentry_sdk', 'picker', 'rest_framework', 'cors_headers']
 
     def __init__(self, package_path):
         self.package_path = package_path
