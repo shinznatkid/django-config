@@ -42,8 +42,8 @@ class RequirementEditor:
 
 class AppInstaller:
 
-    AVAILABLE_APPS = ['sentry_sdk', 'picker', 'sass_processor', 'rest_framework', 'cors_headers']
-    RECOMMEND_APPS = ['sentry_sdk', 'picker', 'rest_framework', 'cors_headers']
+    AVAILABLE_APPS = ['sentry_sdk', 'picker', 'sass_processor', 'rest_framework', 'cors_headers', 'celery']
+    RECOMMEND_APPS = ['sentry_sdk', 'picker', 'rest_framework', 'cors_headers', 'celery']
 
     def __init__(self, package_path):
         self.package_path = package_path
@@ -165,6 +165,38 @@ class AppInstaller:
 
         self.edit_requirements(app_package.requirements)
         self.edit_install_code(app_name)
+        if app_name == 'celery':
+            self.edit_celery_settings(self.project_path, self.project_name)
+        # TODO add celery
 
         print('{} installed.'.format(app_name))
         return True
+
+    def edit_celery_settings(self, project_path, project_name):
+        #create celery.py
+        celery_path = project_path / 'celery.py'
+
+        with celery_path.open('wt') as fw:
+            fw.write('import os\n')
+            fw.write('from celery import Celery\n')
+            fw.write('\n')
+            fw.write('os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{}.settings")\n'.format(project_name))
+            fw.write('\n')
+            fw.write('app = Celery("{}")\n'.format(project_name))
+            fw.write('app.config_from_object("django.conf:settings", namespace="CELERY")\n')
+            fw.write('app.autodiscover_tasks()\n')
+            fw.write('\n')
+            fw.write('@app.task(bind=True)\n')
+            fw.write('def debug_task(self):\n')
+            fw.write('    print("Request: {0!r}".format(self.request))\n')
+            
+        #create __init__.py
+        celery_init_path = project_path / '__init__.py'
+
+        with celery_init_path.open('wt') as fw:
+            fw.write('from .celery import app as celery_app\n')
+            fw.write('\n')
+            fw.write('__all__ = ("celery_app",)\n')
+        
+        
+            
