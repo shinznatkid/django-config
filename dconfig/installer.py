@@ -165,9 +165,9 @@ class AppInstaller:
 
         self.edit_requirements(app_package.requirements)
         self.edit_install_code(app_name)
+
         if app_name == 'celery':
             self.edit_celery_settings(self.project_path, self.project_name)
-        # TODO add celery
 
         print('{} installed.'.format(app_name))
         return True
@@ -179,17 +179,13 @@ class AppInstaller:
         with celery_path.open('wt') as fw:
             fw.write('import os\n')
             fw.write('from celery import Celery\n')
-            fw.write('\n')
+            fw.write('from django.conf import settings\n')
             fw.write('os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{}.settings")\n'.format(project_name))
             fw.write('\n')
             fw.write('app = Celery("{}")\n'.format(project_name))
-            fw.write('app.config_from_object("django.conf:settings", namespace="CELERY")\n')
-            fw.write('app.autodiscover_tasks()\n')
-            fw.write('\n')
-            fw.write('@app.task(bind=True)\n')
-            fw.write('def debug_task(self):\n')
-            fw.write('    print("Request: {0!r}".format(self.request))\n')
-            
+            fw.write('app.config_from_object("django.conf:settings")\n')
+            fw.write('app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)\n')
+
         #create __init__.py
         celery_init_path = project_path / '__init__.py'
 
