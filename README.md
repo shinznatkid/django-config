@@ -6,15 +6,14 @@ Dconfig - Bootstrap Configuration for Django project
 [![Downloads](https://img.shields.io/pypi/v/dconfig.svg)](https://pypi.python.org/pypi/dconfig/)
 [![Downloads](https://img.shields.io/badge/license-MIT-blue.svg)](https://pypi.python.org/pypi/dconfig/)
 
-
 Dconfig is configuration by console for the Django web
 development framework.
 
-Support Django >= 2.0
-
+Support Django >= 2.2
 
 Installation
 ------------
+
 1. Python package
 
         pip install dconfig
@@ -23,24 +22,23 @@ Installation
 
         'dconfig',
 
-
 Usage
 --------
 
 `python manage.py conf`
 
-
 Help
 --------
 
 `python manage.py conf`
-`>>> help`
 
+`>>> help`
 
 Wizard Setup
 --------
 
 `python manage.py conf`
+
 `>>> init`
 
-** WARNING: this action will wipeout all data in settings.py**
+**WARNING: this action will wipeout all data in settings.py**

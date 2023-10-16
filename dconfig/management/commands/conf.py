@@ -161,7 +161,7 @@ class ConfMain(ConfBase):
     command_list = [('show', 'show'), ('exit', 'exit'), ('save', 'save'), ('timezone', 'timezone'), ('autoconfig', 'autoconfig'), ('initialize', 'initialize'), ('migrate', 'migrate'), ('help', 'help')]
 
     def __init__(self, package_path=Path('.')):
-        print('Django Configure 1.4.0')
+        print('Django Configure 1.5.0')
         print('Type "help" for more information.')
         setting_path      = os.environ.get("DJANGO_SETTINGS_MODULE")  # 'projectname.settings'
         self.project_name = setting_path.split('.')[0]

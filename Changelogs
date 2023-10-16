@@ -1,8 +1,14 @@
 # Changelog
 
+## Dconfig 1.5
+
+- Include app `cors_headers` (install via `python manage.py install cors_headers`)
+- Include app `celery` (install via `python manage.py install celery`)
+- Seperate install each recommend app.
+
 ## Dconfig 1.4
 
-- Include app `utils/configs_loader.py`
+- Include `utils/configs_loader.py`
 - Include `uwsgi.ini`
 - Include `static/.gitignore`
 - Update `rest_exception_handler.py`
