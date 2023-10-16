@@ -1,30 +1,11 @@
-import os
-from utils.misc import import_app
 from pathlib import Path
 import dj_database_url
+from utils.configs_loader import load_configs
+from utils.misc import import_app
 
 # dconfig: 1.3
 
-
-class EnvironDict(object):
-
-    def __init__(self, prefix):
-        self.prefix = prefix
-
-    def __getattr__(self, attrname):
-        full_attr_name = self.prefix + attrname
-        if full_attr_name in os.environ:
-            return os.environ[full_attr_name]
-        raise AttributeError()
-
-
-try:
-    import configs
-except ImportError:
-    try:
-        configs = EnvironDict('DJANGO_')
-    except Exception:
-        configs = {}
+configs = load_configs()
 
 
 PROJECT_PATH = Path(__file__).resolve().parent

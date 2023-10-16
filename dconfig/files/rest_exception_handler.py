@@ -10,17 +10,25 @@ from rest_framework.response import Response
 from django.http import Http404
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.utils.translation import ugettext_lazy as _
 
 
 def handle_validation_error(exc):
+    '''
+    exc.detail can be 2 types
+    1. dict e.g. {'name': ['This field is required.']}
+    2. list e.g. ['field name is required.']
+    '''
     headers = {}
-    error_dict = dict(exc.detail)
-    error_messages = []
-    for key, val in error_dict.items():
-        if isinstance(val, list):
-            for error_val in val:
-                error_messages.append('[{}] {}'.format(key, error_val))
+
+    if isinstance(exc.detail, dict):
+        error_dict = exc.detail
+        error_messages = []
+        for key, val in error_dict.items():
+            if isinstance(val, list):
+                for error_val in val:
+                    error_messages.append(f'[{key}] {error_val}')
+    elif isinstance(exc.detail, list):
+        error_messages = exc.detail
 
     if error_messages:
         error_message = '\n'.join(error_messages)
@@ -62,21 +70,21 @@ def handle_api_exception(exc):
 
 
 def handle_404():
-    msg = _('Not found.')
+    msg = 'Not found.'
     data = _get_status_dict(code='NOT_FOUND', message=msg)
     set_rollback()
     return Response(data, status=status.HTTP_404_NOT_FOUND)
 
 
 def handle_permission_denied():
-    msg = _('Permission denied.')
+    msg = 'Permission denied.'
     data = _get_status_dict(code='FORBIDDEN', message=msg)
     set_rollback()
     return Response(data, status=status.HTTP_403_FORBIDDEN)
 
 
 def handle_unseen_error(exc):
-    msg = _('Internal server error.')
+    msg = 'Internal server error.'
     code = getattr(exc, 'code', 'INTERNAL_SERVER_ERROR')
     data = _get_status_dict(code=code, message=msg)
     set_rollback()

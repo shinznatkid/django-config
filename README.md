@@ -34,13 +34,13 @@ Help
 --------
 
 `python manage.py conf`
->>> help
+`>>> help`
 
 
 Wizard Setup
 --------
 
 `python manage.py conf`
->>> init
+`>>> init`
 
 ** WARNING: this action will wipeout all data in settings.py**

@@ -1,5 +1,13 @@
 # Changelog
 
+## Dconfig 1.4
+
+- Include app `utils/configs_loader.py`
+- Include `uwsgi.ini`
+- Include `static/.gitignore`
+- Update `rest_exception_handler.py`
+- Drop support Python 2
+
 ## Dconfig 1.3
 
 - Include app `rest_framework` (install via `python manage.py install rest_framework`)

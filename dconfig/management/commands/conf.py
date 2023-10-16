@@ -11,13 +11,6 @@ from django.utils.crypto import get_random_string
 from ...installer import AppInstaller
 
 
-try:
-    import __builtin__
-    input = getattr(__builtin__, 'raw_input')
-except (ImportError, AttributeError):
-    pass
-
-
 class FuzzyMatcher():
 
     def __init__(self):
@@ -168,7 +161,7 @@ class ConfMain(ConfBase):
     command_list = [('show', 'show'), ('exit', 'exit'), ('save', 'save'), ('timezone', 'timezone'), ('autoconfig', 'autoconfig'), ('initialize', 'initialize'), ('migrate', 'migrate'), ('help', 'help')]
 
     def __init__(self, package_path=Path('.')):
-        print('Django Configure 1.1.0')
+        print('Django Configure 1.4.0')
         print('Type "help" for more information.')
         setting_path      = os.environ.get("DJANGO_SETTINGS_MODULE")  # 'projectname.settings'
         self.project_name = setting_path.split('.')[0]
@@ -325,10 +318,20 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
         with open(str(self.project_path / 'urls.py'), 'at') as fw:
             fw.write('\n{}'.format(url_django_debug_toolbar))
 
+        print('copying uwsgi.ini')
+        files_uwsgi_path = self.files_path / 'uwsgi.ini'
+        with files_uwsgi_path.open('r') as fr:
+            new_data = fr.read().replace('{DJANGO_PROJECT}', self.project_name)
+
+            uwsgi_path = self.root_path / 'uwsgi.ini'
+            with uwsgi_path.open('w') as fw:
+                fw.write(new_data)
+
         self._copy_file(['configs.py.default'])
         create_dir('utils')
 
         self._copy_file(['utils', '__init__.py'])
+        self._copy_file(['utils', 'configs_loader.py'])
         self._copy_file(['utils', 'decorators.py'])
         self._copy_file(['utils', 'misc.py'])
         self._copy_file(['utils', 'rest_views.py'])
@@ -340,6 +343,7 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
 
         self._copy_file(['gitignore'], ['.gitignore'])
         self._copy_file(['media', 'gitignore'], ['media', '.gitignore'])
+        self._copy_file(['static', 'gitignore'], ['static', '.gitignore'])
         self.load()
 
         command = input('Install recommend apps "{}" [Y/n]:'.format(', '.join(AppInstaller.RECOMMEND_APPS)))
