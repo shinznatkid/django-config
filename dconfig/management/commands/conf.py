@@ -341,14 +341,22 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
         self._copy_file(['gitignore'], ['.gitignore'])
         self._copy_file(['media', 'gitignore'], ['media', '.gitignore'])
         self.load()
-
-        command = input('Install recommend apps "{}" [Y/n]:'.format(', '.join(AppInstaller.RECOMMEND_APPS)))
-        if command.lower().startswith('n'):
-            return
         app_installer = AppInstaller(package_path=self.package_path)
-        for app_name in AppInstaller.RECOMMEND_APPS:
-            print('Installing {}'.format(app_name))
-            app_installer.install_app(app_name)
+        for app in AppInstaller.RECOMMEND_APPS:
+            command = input('Install {}? [Y/n]>'.format(app))
+            if command.lower().startswith('n'):
+                continue
+            elif command.lower().startswith('y'):
+                print('Installing {}'.format(app))
+                app_installer.install_app(app)
+                
+        # command = input('Install recommend apps "{}" [Y/n]:'.format(', '.join(AppInstaller.RECOMMEND_APPS)))
+        # if command.lower().startswith('n'):
+        #     return
+        # app_installer = AppInstaller(package_path=self.package_path)
+        # for app_name in AppInstaller.RECOMMEND_APPS:
+        #     print('Installing {}'.format(app_name))
+        #     app_installer.install_app(app_name)
 
     def migrate(self):
         '''
